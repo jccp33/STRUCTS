@@ -2,6 +2,10 @@
 
 **A High-Performance, Multi-Language Data Structures Library in C11**
 
+<p align="center">
+  <img src="./assets/image.gif" alt="STRUCTS Library Visualizations (Linked List, Hash Table, Graph)" width="70%">
+</p>
+
 **STRUCTS** is a lightweight, zero-dependency shared library providing robust implementations of fundamental data structures. Designed with a focus on **interoperability**, it allows high-level languages like Python and C\# to leverage C's raw speed.
 
 ## 🚀 Key Features
