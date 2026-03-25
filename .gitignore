@@ -1,0 +1,30 @@
+# --- Binarios y Ejecutables ---
+# Ignoramos el ejecutable de prueba y las librerías generadas
+test_library
+test_library.exe
+*.dll
+*.so
+*.a
+*.lib
+*.out
+
+# --- Carpetas de Compilación ---
+# No queremos subir los archivos .o ni los binarios finales
+build/
+bin/
+lib/
+
+# --- Documentación ---
+docs/
+
+# --- Archivos de Sistema y Editores ---
+.vscode/
+.idea/
+*.swp
+*.patch
+Thumbs.db
+.DS_Store
+
+# --- Python (Pruebas locales) ---
+__pycache__/
+*.pyc
