@@ -1,12 +1,15 @@
 #ifndef PERSISTENCE_H
 #define PERSISTENCE_H
+#include "list.h"
+#include "hashtable.h"
+#include "graph.h"
 
 typedef enum {
     TYPE_LIST,      // 0
-    TYPE_STACK,     // 1
-    TYPE_QUEUE,     // 2
-    TYPE_HASHTABLE, // 3
-    TYPE_GRAPH      // 4
+    TYPE_GRAPH,     // 1
+    TYPE_HASHTABLE, // 2
+    TYPE_TREE,      // 3
+    TYPE_HEAP       // 4
 } StructureType;
 
 typedef struct {
