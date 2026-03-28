@@ -1,0 +1,1 @@
+ERROR [Sat Mar 28 14:55:46 2026][main.c][30]: Testing errors funcion.

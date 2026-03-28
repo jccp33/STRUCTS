@@ -1,5 +1,7 @@
 #include "hashtable.h"
+#include "error.h"
 #include <string.h>
+#include <stdlib.h>
 
 static void ht_resize(HashTable *ht);
 
@@ -13,39 +15,90 @@ uint32_t hash_djb2(const char *str) {
 
 HashTable* ht_create(uint32_t (*h_func)(const char*)) {
     HashTable *ht = malloc(sizeof(HashTable));
+    if (ht == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_create: malloc(HashTable) failed");
+        return NULL;
+    }
     ht->size = TABLE_SIZE;
     ht->count = 0;
     ht->hash_func = h_func ? h_func : hash_djb2;
     ht->buckets = calloc(ht->size, sizeof(LinkedList*));
+    if (ht->buckets == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_create: calloc(buckets) failed");
+        free(ht);
+        return NULL;
+    }
     return ht;
 }
 
 void ht_insert(HashTable *ht, const char *key, void *data) {
+    if (ht == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_insert: ht is NULL");
+        return;
+    }
+    if (key == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_insert: key is NULL");
+        return;
+    }
     if ((float)(ht->count + 1) / ht->size > 0.7) {
         ht_resize(ht);
+        if (ht->buckets == NULL || ht->size == 0) {
+            printErrorOnFile("hashtable.c", __LINE__, "ht_insert: ht_resize failed");
+            return;
+        }
     }
     uint32_t index = ht->hash_func(key) % ht->size;
     if (ht->buckets[index] == NULL) {
         ht->buckets[index] = list_create();
+        if (ht->buckets[index] == NULL) {
+            printErrorOnFile("hashtable.c", __LINE__, "ht_insert: list_create failed");
+            return;
+        }
     }
     HTEntry *entry = malloc(sizeof(HTEntry));
+    if (entry == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_insert: malloc(HTEntry) failed");
+        return;
+    }
     entry->key = strdup(key);
+    if (entry->key == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_insert: strdup(key) failed");
+        free(entry);
+        return;
+    }
     entry->value = data;
     list_add_back(ht->buckets[index], entry);
     ht->count++;
 }
 
 void* ht_get(HashTable *ht, const char *key, int (*compare)(void*, void*)) {
-    if (ht == NULL || key == NULL) return NULL;
+    if (ht == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_get: ht is NULL");
+        return NULL;
+    }
+    if (key == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_get: key is NULL");
+        return NULL;
+    }
+    if (ht->size == 0 || ht->buckets == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_get: invalid ht internal state");
+        return NULL;
+    }
     uint32_t index = ht->hash_func(key) % ht->size;
-    if (ht->buckets[index] == NULL) return NULL;
+    if (ht->buckets[index] == NULL) {
+        return NULL;
+    }
     NODE *curr = ht->buckets[index]->head;
     while (curr != NULL) {
         HTEntry *entry = (HTEntry*)curr->data;
+        if (entry == NULL) {
+            curr = curr->next;
+            continue;
+        }
         if (compare != NULL) {
             if (compare(entry->value, (void*)key) == 0) return entry->value;
         } else {
-            if (strcmp(entry->key, key) == 0) return entry->value;
+            if (entry->key && strcmp(entry->key, key) == 0) return entry->value;
         }
         curr = curr->next;
     }
@@ -53,17 +106,39 @@ void* ht_get(HashTable *ht, const char *key, int (*compare)(void*, void*)) {
 }
 
 static void ht_resize(HashTable *ht) {
+    if (ht == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_resize: ht is NULL");
+        return;
+    }
+    if (ht->size == 0 || ht->buckets == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_resize: invalid ht internal state");
+        return;
+    }
     size_t old_size = ht->size;
     size_t new_size = old_size * 2;
     LinkedList **new_buckets = calloc(new_size, sizeof(LinkedList*));
+    if (new_buckets == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_resize: calloc(new_buckets) failed");
+        return;
+    }
     for (size_t i = 0; i < old_size; i++) {
         if (ht->buckets[i] != NULL) {
             NODE *curr = ht->buckets[i]->head;
             while (curr != NULL) {
                 HTEntry *entry = (HTEntry*)curr->data;
+                if (entry == NULL || entry->key == NULL) {
+                    curr = curr->next;
+                    continue;
+                }
                 uint32_t new_index = ht->hash_func(entry->key) % new_size;
                 if (new_buckets[new_index] == NULL) {
                     new_buckets[new_index] = list_create();
+                    if (new_buckets[new_index] == NULL) {
+                        printErrorOnFile("hashtable.c", __LINE__, "ht_resize: list_create failed for new bucket");
+                        // no free of old structure to preserve data. continue with next.
+                        curr = curr->next;
+                        continue;
+                    }
                 }
                 list_add_back(new_buckets[new_index], entry);
                 curr = curr->next;
@@ -84,14 +159,22 @@ static void free_ht_entry(void *data) {
 }
 
 void ht_destroy(HashTable *ht, void (*destroy_data)(void*)) {
-    if (!ht) return;
+    if (ht == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_destroy: ht is NULL");
+        return;
+    }
+    if (ht->buckets == NULL) {
+        printErrorOnFile("hashtable.c", __LINE__, "ht_destroy: ht->buckets is NULL");
+        free(ht);
+        return;
+    }
     for (size_t i = 0; i < ht->size; i++) {
         if (ht->buckets[i] != NULL) {
             if (destroy_data != NULL) {
                 NODE *curr = ht->buckets[i]->head;
                 while (curr) {
                     HTEntry *e = (HTEntry*)curr->data;
-                    destroy_data(e->value);
+                    if (e != NULL) destroy_data(e->value);
                     curr = curr->next;
                 }
             }

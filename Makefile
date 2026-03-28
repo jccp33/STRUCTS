@@ -6,7 +6,8 @@ BIN_DIR = bin
 LIB_DIR = lib
 
 # 1. Lista de archivos fuente
-SRCS = node/node.c \
+SRCS = error/error.c \
+	   node/node.c \
        list/list.c list/list_persistence.c \
        stack/stack.c \
        queue/queue.c \

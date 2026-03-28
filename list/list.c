@@ -1,22 +1,32 @@
 #include "list.h"
+#include "error.h"
 #include <stdlib.h>
 
 LinkedList* list_create() {
     LinkedList *list = (LinkedList*)malloc(sizeof(LinkedList));
-    if (list) {
-        list->head = NULL;
-        list->tail = NULL;
-        list->size = 0;
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_create: malloc(LinkedList) failed");
+        return NULL;
     }
+    list->head = NULL;
+    list->tail = NULL;
+    list->size = 0;
     return list;
 }
 
 void list_add_front(LinkedList *list, void *data) {
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_add_front: list is NULL");
+        return;
+    }
     NODE *new_node = create_node(data);
-    if (!new_node) return;
-    if(list->head == NULL){
+    if (!new_node) {
+        printErrorOnFile("list.c", __LINE__, "list_add_front: create_node failed");
+        return;
+    }
+    if (list->head == NULL) {
         list->head = list->tail = new_node;
-    }else{
+    } else {
         new_node->next = list->head;
         list->head->prev = new_node;
         list->head = new_node;
@@ -25,8 +35,15 @@ void list_add_front(LinkedList *list, void *data) {
 }
 
 void list_add_back(LinkedList *list, void *data) {
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_add_back: list is NULL");
+        return;
+    }
     NODE *new_node = create_node(data);
-    if (!new_node) return;
+    if (!new_node) {
+        printErrorOnFile("list.c", __LINE__, "list_add_back: create_node failed");
+        return;
+    }
     if (list->tail == NULL) {
         list->head = list->tail = new_node;
     } else {
@@ -38,6 +55,10 @@ void list_add_back(LinkedList *list, void *data) {
 }
 
 void list_destroy(LinkedList *list, void (*destroy_data)(void*)) {
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_destroy: list is NULL");
+        return;
+    }
     NODE *current = list->head;
     while (current != NULL) {
         NODE *next = current->next;
@@ -51,20 +72,24 @@ void list_destroy(LinkedList *list, void (*destroy_data)(void*)) {
 }
 
 void list_remove_node(LinkedList *list, NODE *node, void (*destroy_data)(void*)) {
-    if (list == NULL || node == NULL) return;
-    // 1. Ajustar el puntero del nodo anterior
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_remove_node: list is NULL");
+        return;
+    }
+    if (node == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_remove_node: node is NULL");
+        return;
+    }
     if (node->prev != NULL) {
         node->prev->next = node->next;
     } else {
         list->head = node->next;
     }
-    // 2. Ajustar el puntero del nodo siguiente
     if (node->next != NULL) {
         node->next->prev = node->prev;
     } else {
         list->tail = node->prev;
     }
-    // 3. Liberar memoria
     if (destroy_data != NULL) {
         destroy_data(node->data);
     }
@@ -73,6 +98,14 @@ void list_remove_node(LinkedList *list, NODE *node, void (*destroy_data)(void*))
 }
 
 NODE* list_find(LinkedList *list, void *data, int (*compare)(void*, void*)) {
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_find: list is NULL");
+        return NULL;
+    }
+    if (compare == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_find: compare function is NULL");
+        return NULL;
+    }
     NODE *current = list->head;
     while (current != NULL) {
         if (compare(current->data, data) == 0) {
@@ -84,10 +117,13 @@ NODE* list_find(LinkedList *list, void *data, int (*compare)(void*, void*)) {
 }
 
 bool list_is_empty(LinkedList *list) {
-    return (list == NULL || list->head == NULL);
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_is_empty: list is NULL");
+        return true;
+    }
+    return (list->head == NULL);
 }
 
-// Función auxiliar: Mezcla dos listas ya ordenadas
 NODE* merge(NODE *first, NODE *second, int (*compare)(void*, void*)) {
     if (!first) return second;
     if (!second) return first;
@@ -104,7 +140,6 @@ NODE* merge(NODE *first, NODE *second, int (*compare)(void*, void*)) {
     }
 }
 
-// Función auxiliar: Divide la lista en dos mitades usando la técnica de 'slow and fast'
 NODE* split(NODE *head) {
     NODE *fast = head, *slow = head;
     while (fast->next && fast->next->next) {
@@ -117,7 +152,6 @@ NODE* split(NODE *head) {
     return temp;
 }
 
-// Función recursiva principal
 NODE* merge_sort_recursive(NODE *head, int (*compare)(void*, void*)) {
     if (!head || !head->next) return head;
     NODE *second = split(head);
@@ -126,7 +160,6 @@ NODE* merge_sort_recursive(NODE *head, int (*compare)(void*, void*)) {
     return merge(head, second, compare);
 }
 
-// Función pública para tu librería
 void list_sort(LinkedList *list, int (*compare)(void*, void*)) {
     if (!list || list->size < 2) return;
     list->head = merge_sort_recursive(list->head, compare);
@@ -138,7 +171,14 @@ void list_sort(LinkedList *list, int (*compare)(void*, void*)) {
 }
 
 void list_foreach(LinkedList *list, void (*action)(void*)) {
-    if (!list || !action) return;    
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_foreach: list is NULL");
+        return;
+    }
+    if (action == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_foreach: action callback is NULL");
+        return;
+    }
     NODE *curr = list->head;
     while (curr != NULL) {
         action(curr->data);

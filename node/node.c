@@ -1,8 +1,10 @@
 #include "node.h"
+#include "error.h"
 
 NODE* create_node(void *data) {
     NODE *new_node = (NODE *)malloc(sizeof(NODE));
     if (new_node == NULL) {
+        printErrorOnFile("node.c", __LINE__, "create_node: malloc(NODE) failed");
         return NULL;
     }
     new_node->data = data;

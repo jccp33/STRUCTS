@@ -4,8 +4,17 @@
 #include "list.h"
 #include "hashtable.h"
 #include "graph.h"
+#include "error.h"
 
-LoadedStructure load_from_file(const char *filename, StructureType type, void* (*parser)(char*)) {
+LoadedStructure load_from_file(const char *filename, StructureType type, void* (*parser)(char*)){
+    if (filename == NULL) {
+        printErrorOnFile("persistence.c", __LINE__, "load_from_file: filename is NULL");
+        exit(EXIT_FAILURE);
+    }
+    if (parser == NULL) {
+        printErrorOnFile("persistence.c", __LINE__, "load_from_file: parser is NULL");
+        exit(EXIT_FAILURE);
+    }
     LoadedStructure result;
     result.type = type;
     result.data = NULL;
