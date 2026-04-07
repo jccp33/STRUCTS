@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Graph* graph_create(int vertices, bool directed) {
+Graph *graph_create(int vertices, bool directed) {
     if (vertices <= 0) {
         printErrorOnFile("graph.c", __LINE__, "graph_create: invalid number of vertices");
         return NULL;
@@ -15,7 +15,7 @@ Graph* graph_create(int vertices, bool directed) {
     }
     graph->num_vertices = vertices;
     graph->is_directed = directed;
-    graph->adj_lists = malloc(vertices * sizeof(LinkedList*));
+    graph->adj_lists = malloc(vertices * sizeof(LinkedList *));
     if (graph->adj_lists == NULL) {
         printErrorOnFile("graph.c", __LINE__, "graph_create: falla malloc(adj_lists)");
         free(graph);
@@ -35,35 +35,51 @@ Graph* graph_create(int vertices, bool directed) {
     return graph;
 }
 
-void graph_add_edge(Graph *graph, int src, int dest) {
+void graph_add_edge(Graph *graph, int src, int dest, int weight) {
     if (graph == NULL) {
         printErrorOnFile("graph.c", __LINE__, "graph_add_edge: graph is NULL");
         return;
     }
     if (src < 0 || src >= graph->num_vertices || dest < 0 || dest >= graph->num_vertices) {
-        printErrorOnFile("graph.c", __LINE__, "graph_add_edge: vertex index out of range");
+        char mssg[256];
+        snprintf(mssg, sizeof(mssg), "graph_add_edge: vertex index out of range. src: %d, dest: %d, verts: %d", src, dest, graph->num_vertices);
+        printErrorOnFile("graph.c", __LINE__, mssg);
         return;
     }
     if (src == dest) {
-        printErrorOnFile("graph.c", __LINE__, "graph_add_edge: self-loop not allowed");
+        char mssg[256];
+        snprintf(mssg, sizeof(mssg), "graph_add_edge: self-loop not allowed. src: %d, dest: %d", src, dest);
+        printErrorOnFile("graph.c", __LINE__, mssg);
         return;
     }
     NODE *curr = graph->adj_lists[src]->head;
     while (curr) {
-        if ((int)(intptr_t)curr->data == dest) {
-            printErrorOnFile("graph.c", __LINE__, "graph_add_edge: edge already exists");
+        if (((Edge *)curr->data)->dest == dest) {
+            char mssg[256];
+            snprintf(mssg, sizeof(mssg), "graph_add_edge: edge already exists. src: %d, dest: %d", src, dest);
+            printErrorOnFile("graph.c", __LINE__, mssg);
             return;
         }
         curr = curr->next;
     }
-    list_add_back(graph->adj_lists[src], (void*)(intptr_t)dest);
-    if (graph->adj_lists[src]->tail == NULL || (int)(intptr_t)graph->adj_lists[src]->tail->data != dest) {
+    Edge *edge = malloc(sizeof(Edge));
+    if (!edge)
+        return;
+    edge->dest = dest;
+    edge->weight = weight;
+    list_add_back(graph->adj_lists[src], (void *)edge);
+    if (graph->adj_lists[src]->tail == NULL || ((Edge *)graph->adj_lists[src]->tail->data)->dest != dest) {
         printErrorOnFile("graph.c", __LINE__, "graph_add_edge: failed to add destination");
         return;
     }
     if (!graph->is_directed) {
-        list_add_back(graph->adj_lists[dest], (void*)(intptr_t)src);
-        if (graph->adj_lists[dest]->tail == NULL || (int)(intptr_t)graph->adj_lists[dest]->tail->data != src) {
+        Edge *rev_edge = malloc(sizeof(Edge));
+        if (!rev_edge)
+            return;
+        rev_edge->dest = src;
+        rev_edge->weight = weight;
+        list_add_back(graph->adj_lists[dest], (void *)rev_edge);
+        if (graph->adj_lists[dest]->tail == NULL || ((Edge *)graph->adj_lists[dest]->tail->data)->dest != src) {
             printErrorOnFile("graph.c", __LINE__, "graph_add_edge: failed to add source in undirected graph");
         }
     }
@@ -74,19 +90,24 @@ void graph_print(Graph *graph) {
         printErrorOnFile("graph.c", __LINE__, "graph_print: graph is NULL");
         return;
     }
+    printf("==========================================\n");
+    printf("[ORIG] : DEST1(WEIGHT), DEST2(WEIGHT), ...\n");
+    printf("==========================================\n");
     for (int i = 0; i < graph->num_vertices; i++) {
         if (graph->adj_lists[i] == NULL) {
             printErrorOnFile("graph.c", __LINE__, "graph_print: adjacency list is NULL for a vertex");
             continue;
         }
-        printf("Vertice %d: ", i);
+        printf("[%d]: ", i);
         NODE *curr = graph->adj_lists[i]->head;
         while (curr) {
-            printf("%d -> ", (int)(intptr_t)curr->data);
+            Edge *e = (Edge *)curr->data;
+            printf("%d(%d), ", e->dest, e->weight);
             curr = curr->next;
         }
         printf("NULL\n");
     }
+    printf("==========================================\n");
 }
 
 void graph_destroy(Graph *graph) {
@@ -101,7 +122,7 @@ void graph_destroy(Graph *graph) {
     }
     for (int i = 0; i < graph->num_vertices; i++) {
         if (graph->adj_lists[i] != NULL) {
-            list_destroy(graph->adj_lists[i], NULL);
+            list_destroy(graph->adj_lists[i], free);
         }
     }
     free(graph->adj_lists);

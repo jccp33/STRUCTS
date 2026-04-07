@@ -30,7 +30,7 @@ void graph_save_txt(Graph *graph, const char *filename, char* (*get_node_name)(i
         bool has_connections = false;
         NODE *curr = graph->adj_lists[i]->head;
         while (curr) {
-            int dest_id = (int)(intptr_t)curr->data;
+            int dest_id = ((Edge*)curr->data)->dest;
             if (dest_id < 0 || dest_id >= graph->num_vertices) {
                 printErrorOnFile("graph_persistence.c", __LINE__, "graph_save_txt: destination node index out of range");
                 curr = curr->next;
@@ -45,7 +45,7 @@ void graph_save_txt(Graph *graph, const char *filename, char* (*get_node_name)(i
                 NODE *next_node = curr->next;
                 bool further = false;
                 while(next_node) {
-                    if (graph->is_directed || i < (int)(intptr_t)next_node->data) {
+                    if (graph->is_directed || i < ((Edge*)next_node->data)->dest) {
                         further = true; break;
                     }
                     next_node = next_node->next;
@@ -107,7 +107,7 @@ void graph_load_txt(Graph *graph, const char *filename, int (*get_id_by_name)(ch
                 char *dest_name = trim_spaces(token);
                 int dest_id = get_id_by_name(dest_name);
                 if (dest_id != -1) {
-                    graph_add_edge(graph, src_id, dest_id);
+                    graph_add_edge(graph, src_id, dest_id, 0);
                 } else {
                     printErrorOnFile("graph_persistence.c", __LINE__, "graph_load_txt: destination name not found in mapping");
                 }

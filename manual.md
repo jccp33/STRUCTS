@@ -21,7 +21,7 @@
 | **HashTable** | `hashtable.h` | Diccionarios, índices de búsqueda rápida $O(1)$. |
 | **Tree (AVL/BST)** | `tree.h` | Datos ordenados, búsquedas jerárquicas. |
 | **Heap** | `heap.h` | Colas de prioridad, algoritmos de selección. |
-| **Graph** | `graph.h` | Redes, topologías, cálculo de rutas (BFS/Shortest Path). |
+| **Graph (Weighted)** | `graph.h` | Redes con pesos, topologías, grafos TSP / Dijkstra (Edge structs). |
 
 ---
 

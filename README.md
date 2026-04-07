@@ -24,7 +24,7 @@
 | **LinkedList** | $O(1)$ | $O(n)$ | $O(n)$ |
 | **HashTable** | $O(1)$ | $O(n)$ | $O(n)$ |
 | **AVL Tree** | $O(\log n)$ | $O(\log n)$ | $O(n)$ |
-| **Graph (BFS)** | - | $O(V + E)$ | $O(V^2)$ |
+| **Graph (Weighted)** | - | $O(V + E)$ | $O(V^2)$ |
 
 -----
 

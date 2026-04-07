@@ -58,7 +58,7 @@ void graph_find_path(Graph *graph, int start_node, int end_node, char* (*get_nam
         }
         NODE *neighbor = graph->adj_lists[curr]->head;
         while (neighbor) {
-            int next_id = (int)(intptr_t)neighbor->data;
+            int next_id = ((Edge*)neighbor->data)->dest;
             if (next_id < 0 || next_id >= graph->num_vertices) {
                 printErrorOnFile("graph_algorithms.c", __LINE__, "graph_find_path: neighbor node index out of range");
             } else if (!visited[next_id]) {

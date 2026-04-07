@@ -9,9 +9,14 @@ typedef struct Graph {
     bool is_directed;
 } Graph;
 
+typedef struct Edge {
+    int dest;
+    int weight;
+} Edge;
+
 Graph* graph_create(int vertices, bool directed);
 
-void graph_add_edge(Graph *graph, int src, int dest);
+void graph_add_edge(Graph *graph, int src, int dest, int weight);
 
 void graph_print(Graph *graph);
 
