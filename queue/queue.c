@@ -4,8 +4,8 @@ Queue* queue_create() {
     return list_create();
 }
 
-void queue_enqueue(Queue *queue, void *data) {
-    list_add_back(queue, data);
+void queue_enqueue(Queue *queue, void *data, int index) {
+    list_add_back(queue, data, index);
 }
 
 void* queue_dequeue(Queue *queue) {

@@ -52,12 +52,14 @@ void list_load_txt(LinkedList *list, const char *filename, void* (*parse_func)(c
         return;
     }
     char line[256];
+    int index = 0;
     while (fgets(line, sizeof(line), file)) {
         if (line[0] == '#' || line[0] == '\n') continue;
         line[strcspn(line, "\n")] = 0;
         void *data = parse_func(line);
         if (data) {
-            list_add_back(list, data);
+            list_add_back(list, data, index);
+            index++;
         } else {
             printErrorOnFile("list_persistence.c", __LINE__, "list_load_txt: parse_func failed for line");
         }

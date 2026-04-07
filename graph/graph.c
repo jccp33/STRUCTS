@@ -35,7 +35,7 @@ Graph *graph_create(int vertices, bool directed) {
     return graph;
 }
 
-void graph_add_edge(Graph *graph, int src, int dest, int weight) {
+void graph_add_edge(Graph *graph, int src, int dest, int weight, int index) {
     if (graph == NULL) {
         printErrorOnFile("graph.c", __LINE__, "graph_add_edge: graph is NULL");
         return;
@@ -67,7 +67,7 @@ void graph_add_edge(Graph *graph, int src, int dest, int weight) {
         return;
     edge->dest = dest;
     edge->weight = weight;
-    list_add_back(graph->adj_lists[src], (void *)edge);
+    list_add_back(graph->adj_lists[src], (void *)edge, index);
     if (graph->adj_lists[src]->tail == NULL || ((Edge *)graph->adj_lists[src]->tail->data)->dest != dest) {
         printErrorOnFile("graph.c", __LINE__, "graph_add_edge: failed to add destination");
         return;
@@ -78,7 +78,7 @@ void graph_add_edge(Graph *graph, int src, int dest, int weight) {
             return;
         rev_edge->dest = src;
         rev_edge->weight = weight;
-        list_add_back(graph->adj_lists[dest], (void *)rev_edge);
+        list_add_back(graph->adj_lists[dest], (void *)rev_edge, index);
         if (graph->adj_lists[dest]->tail == NULL || ((Edge *)graph->adj_lists[dest]->tail->data)->dest != src) {
             printErrorOnFile("graph.c", __LINE__, "graph_add_edge: failed to add source in undirected graph");
         }

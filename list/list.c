@@ -14,12 +14,12 @@ LinkedList* list_create() {
     return list;
 }
 
-void list_add_front(LinkedList *list, void *data) {
+void list_add_front(LinkedList *list, void *data, int index) {
     if (list == NULL) {
         printErrorOnFile("list.c", __LINE__, "list_add_front: list is NULL");
         return;
     }
-    NODE *new_node = create_node(data);
+    NODE *new_node = create_node(data, index);
     if (!new_node) {
         printErrorOnFile("list.c", __LINE__, "list_add_front: create_node failed");
         return;
@@ -34,12 +34,12 @@ void list_add_front(LinkedList *list, void *data) {
     list->size++;
 }
 
-void list_add_back(LinkedList *list, void *data) {
+void list_add_back(LinkedList *list, void *data, int index) {
     if (list == NULL) {
         printErrorOnFile("list.c", __LINE__, "list_add_back: list is NULL");
         return;
     }
-    NODE *new_node = create_node(data);
+    NODE *new_node = create_node(data, index);
     if (!new_node) {
         printErrorOnFile("list.c", __LINE__, "list_add_back: create_node failed");
         return;
@@ -184,4 +184,19 @@ void list_foreach(LinkedList *list, void (*action)(void*)) {
         action(curr->data);
         curr = curr->next;
     }
+}
+
+NODE* list_get_at(LinkedList *list, int index){
+    if (list == NULL) {
+        printErrorOnFile("list.c", __LINE__, "list_get_at: list is NULL");
+        return NULL;
+    }
+    NODE *current = list->head;
+    while (current != NULL) {
+        if (current->index == index) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
 }

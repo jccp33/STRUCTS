@@ -16,7 +16,7 @@ typedef struct Edge {
 
 Graph* graph_create(int vertices, bool directed);
 
-void graph_add_edge(Graph *graph, int src, int dest, int weight);
+void graph_add_edge(Graph *graph, int src, int dest, int weight, int index);
 
 void graph_print(Graph *graph);
 

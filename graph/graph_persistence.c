@@ -107,7 +107,7 @@ void graph_load_txt(Graph *graph, const char *filename, int (*get_id_by_name)(ch
                 char *dest_name = trim_spaces(token);
                 int dest_id = get_id_by_name(dest_name);
                 if (dest_id != -1) {
-                    graph_add_edge(graph, src_id, dest_id, 0);
+                    graph_add_edge(graph, src_id, dest_id, 0, 0);
                 } else {
                     printErrorOnFile("graph_persistence.c", __LINE__, "graph_load_txt: destination name not found in mapping");
                 }

@@ -20,16 +20,16 @@ int main() {
     printf("--------------- TESTING STRUCTS ---------------\n\n");
 
     Graph *graph = graph_create(5, false);
-    graph_add_edge(graph, 0, 1, 3);
-    graph_add_edge(graph, 0, 2, 5);
-    graph_add_edge(graph, 0, 3, 9);
-    graph_add_edge(graph, 0, 4, 7);
-    graph_add_edge(graph, 1, 2, 2);
-    graph_add_edge(graph, 1, 3, 6);
-    graph_add_edge(graph, 1, 4, 8);
-    graph_add_edge(graph, 2, 3, 1);
-    graph_add_edge(graph, 2, 4, 4);
-    graph_add_edge(graph, 3, 4, 5);
+    graph_add_edge(graph, 0, 1, 3, 0);
+    graph_add_edge(graph, 0, 2, 5, 0);
+    graph_add_edge(graph, 0, 3, 9, 0);
+    graph_add_edge(graph, 0, 4, 7, 0);
+    graph_add_edge(graph, 1, 2, 2, 0);
+    graph_add_edge(graph, 1, 3, 6, 0);
+    graph_add_edge(graph, 1, 4, 8, 0);
+    graph_add_edge(graph, 2, 3, 1, 0);
+    graph_add_edge(graph, 2, 4, 4, 0);
+    graph_add_edge(graph, 3, 4, 5, 0);
 
     graph_print(graph);
     graph_destroy(graph);

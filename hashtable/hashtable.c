@@ -67,7 +67,7 @@ void ht_insert(HashTable *ht, const char *key, void *data) {
         return;
     }
     entry->value = data;
-    list_add_back(ht->buckets[index], entry);
+    list_add_back(ht->buckets[index], entry, 0);
     ht->count++;
 }
 
@@ -140,7 +140,7 @@ static void ht_resize(HashTable *ht) {
                         continue;
                     }
                 }
-                list_add_back(new_buckets[new_index], entry);
+                list_add_back(new_buckets[new_index], entry, 0);
                 curr = curr->next;
             }
             list_destroy(ht->buckets[i], NULL);

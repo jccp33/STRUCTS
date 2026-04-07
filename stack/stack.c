@@ -4,8 +4,8 @@ Stack* stack_create() {
     return list_create();
 }
 
-void stack_push(Stack *stack, void *data) {
-    list_add_front(stack, data);
+void stack_push(Stack *stack, void *data, int index) {
+    list_add_front(stack, data, index);
 }
 
 void* stack_pop(Stack *stack) {

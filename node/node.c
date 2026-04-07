@@ -1,7 +1,7 @@
 #include "node.h"
 #include "error.h"
 
-NODE* create_node(void *data) {
+NODE* create_node(void *data, int index) {
     NODE *new_node = (NODE *)malloc(sizeof(NODE));
     if (new_node == NULL) {
         printErrorOnFile("node.c", __LINE__, "create_node: malloc(NODE) failed");
@@ -10,6 +10,7 @@ NODE* create_node(void *data) {
     new_node->data = data;
     new_node->next = NULL;
     new_node->prev = NULL;
+    new_node->index = index;
     return new_node;
 }
 

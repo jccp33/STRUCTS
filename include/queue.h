@@ -7,7 +7,7 @@ typedef LinkedList Queue;
 
 Queue* queue_create();
 
-void queue_enqueue(Queue *queue, void *data);
+void queue_enqueue(Queue *queue, void *data, int index);
 
 void* queue_dequeue(Queue *queue);
 

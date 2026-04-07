@@ -44,7 +44,7 @@ void graph_find_path(Graph *graph, int start_node, int end_node, char* (*get_nam
         return;
     }
     visited[start_node] = true;
-    queue_enqueue(q, (void*)(intptr_t)start_node);
+    queue_enqueue(q, (void*)(intptr_t)start_node, 0);
     bool found = false;
     while (!queue_is_empty(q)) {
         int curr = (int)(intptr_t)queue_dequeue(q);
@@ -64,7 +64,7 @@ void graph_find_path(Graph *graph, int start_node, int end_node, char* (*get_nam
             } else if (!visited[next_id]) {
                 visited[next_id] = true;
                 parent[next_id] = curr;
-                queue_enqueue(q, (void*)(intptr_t)next_id);
+                queue_enqueue(q, (void*)(intptr_t)next_id, 0);
             }
             neighbor = neighbor->next;
         }

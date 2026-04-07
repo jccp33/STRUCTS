@@ -22,9 +22,6 @@ LoadedStructure load_from_file(const char *filename, StructureType type, void* (
         case TYPE_LIST:
         case TYPE_STACK:
         case TYPE_QUEUE:
-            result.data = list_create();
-            list_load_txt((LinkedList*)result.data, filename, parser);
-            break;
         case TYPE_HASHTABLE:
             result.data = ht_create(hash_djb2);
             ht_load_txt((HashTable*)result.data, filename, parser);

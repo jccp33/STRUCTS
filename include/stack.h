@@ -7,7 +7,7 @@ typedef LinkedList Stack;
 
 Stack* stack_create();
 
-void stack_push(Stack *stack, void *data);
+void stack_push(Stack *stack, void *data, int index);
 
 void* stack_pop(Stack *stack);
 
